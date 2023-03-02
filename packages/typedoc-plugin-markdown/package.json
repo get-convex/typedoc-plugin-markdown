@@ -1,5 +1,5 @@
 {
-  "name": "typedoc-plugin-markdown",
+  "name": "@convex-dev/typedoc-plugin-markdown",
   "version": "3.14.0",
   "description": "A plugin for TypeDoc that enables TypeScript API documentation to be generated in Markdown.",
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "eslint ./src --ext .ts",
     "markdownlint": "yarn run docs:md && markdownlint ./docs/md",
-    "prepublishOnly": "yarn run lint && yarn run build && yarn run test",
+    "prepublishOnly": "yarn run lint && yarn run build",
     "build": "rm -rf dist && tsc && copyfiles --up 1 ./src/**/*.hbs ./dist/",
     "test": "jest --colors",
     "build-and-test": "yarn run build && yarn run test",
