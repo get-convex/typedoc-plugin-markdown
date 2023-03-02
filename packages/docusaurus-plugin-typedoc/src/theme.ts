@@ -109,7 +109,7 @@ export class DocusaurusTheme extends MarkdownTheme {
     const sidebarPosition = this.getSidebarPosition(page);
     let items: FrontMatter = {
       id: pageId,
-      title: pageTitle,
+      title: pageTitle.replace(/\\/g, ''),
     };
     if (page.url === this.entryDocument && this.indexSlug) {
       items = { ...items, slug: this.indexSlug };
