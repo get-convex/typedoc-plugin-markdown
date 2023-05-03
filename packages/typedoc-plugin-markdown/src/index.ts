@@ -1,10 +1,41 @@
-import { Application, ParameterType } from 'typedoc';
+import {
+  Application,
+  Context,
+  Converter,
+  DeclarationReflection,
+  ParameterType,
+} from 'typedoc';
 import { MarkdownThemeOptionsReader } from './options-reader';
 import { MarkdownTheme } from './theme';
 
+// Docusaurus + typedoc doesn't understand that we process the monorepo to build docs but
+// want links to go to the open source repository.
+//
+// Line numbers will shift when we deploy docs without syncing the open source repo!
+// Good enough for now. Someday we could build docs from the open source repo instead.
+const URL_SUBSTRING_TO_REMOVE = 'npm-packages/convex/';
+
 export function load(app: Application) {
-  app.renderer.defineTheme('markdown', MarkdownTheme);
+  app.renderer.defineTheme("markdown", MarkdownTheme);
   app.options.addReader(new MarkdownThemeOptionsReader());
+
+  app.converter.on(Converter.EVENT_RESOLVE_END, (context: Context) => {
+    console.log(
+      'Running custom plugin code to fix URLs, see https://github.com/get-convex/typedoc-plugin-markdown',
+    );
+    const project = context.project;
+    project.getSymbolIdFromReflection;
+    for (const reflection of Object.values(project.reflections)) {
+      if (reflection.variant === 'declaration') {
+        const r = reflection as DeclarationReflection;
+        for (const source of r.sources || []) {
+          if (source.url) {
+            source.url = source.url.replace(URL_SUBSTRING_TO_REMOVE, '');
+          }
+        }
+      }
+    }
+  });
 
   app.options.addDeclaration({
     help: '[Markdown Plugin] Do not render page title.',
