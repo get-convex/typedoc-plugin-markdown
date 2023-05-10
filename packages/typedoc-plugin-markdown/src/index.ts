@@ -1,10 +1,4 @@
-import {
-  Application,
-  Context,
-  Converter,
-  DeclarationReflection,
-  ParameterType,
-} from 'typedoc';
+import { Application, Context, Converter, ParameterType } from 'typedoc';
 import { MarkdownThemeOptionsReader } from './options-reader';
 import { MarkdownTheme } from './theme';
 
@@ -16,19 +10,17 @@ import { MarkdownTheme } from './theme';
 const URL_SUBSTRING_TO_REMOVE = 'npm-packages/convex/';
 
 export function load(app: Application) {
-  app.renderer.defineTheme("markdown", MarkdownTheme);
+  app.renderer.defineTheme('markdown', MarkdownTheme);
   app.options.addReader(new MarkdownThemeOptionsReader());
 
   app.converter.on(Converter.EVENT_RESOLVE_END, (context: Context) => {
     console.log(
       'Running custom plugin code to fix URLs, see https://github.com/get-convex/typedoc-plugin-markdown',
     );
-    const project = context.project;
-    project.getSymbolIdFromReflection;
-    for (const reflection of Object.values(project.reflections)) {
-      if (reflection.variant === 'declaration') {
-        const r = reflection as DeclarationReflection;
-        for (const source of r.sources || []) {
+
+    for (const reflection of Object.values(context.project.reflections)) {
+      if ('sources' in reflection && Array.isArray(reflection.sources)) {
+        for (const source of reflection.sources) {
           if (source.url) {
             source.url = source.url.replace(URL_SUBSTRING_TO_REMOVE, '');
           }
@@ -112,18 +104,19 @@ export function load(app: Application) {
     defaultValue: false,
   });
 
-  
   app.options.addDeclaration({
     help: '[Markdown Plugin] Specify the Type Declaration Render Style',
     name: 'objectLiteralTypeDeclarationStyle',
     type: ParameterType.String,
-    defaultValue: "table",
+    defaultValue: 'table',
     validate: (x) => {
-      const availableValues = ["table", "list"];
-      if (!availableValues.includes(x)){
-        throw new Error(`Wrong value for objectLiteralTypeDeclarationStyle, the expected value is one of ${availableValues}`)
+      const availableValues = ['table', 'list'];
+      if (!availableValues.includes(x)) {
+        throw new Error(
+          `Wrong value for objectLiteralTypeDeclarationStyle, the expected value is one of ${availableValues}`,
+        );
       }
-    }
+    },
   });
 }
 export { MarkdownTheme };
