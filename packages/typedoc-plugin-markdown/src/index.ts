@@ -18,12 +18,21 @@ export function load(app: Application) {
       'Running custom plugin code to fix URLs, see https://github.com/get-convex/typedoc-plugin-markdown',
     );
 
-    for (const reflection of Object.values(context.project.reflections)) {
-      if ('sources' in reflection && Array.isArray(reflection.sources)) {
-        for (const source of reflection.sources) {
+    function updateSources(obj: any) {
+      if ('sources' in obj && Array.isArray(obj.sources)) {
+        for (const source of obj.sources) {
           if (source.url) {
             source.url = source.url.replace(URL_SUBSTRING_TO_REMOVE, '');
           }
+        }
+      }
+    }
+
+    for (const reflection of Object.values(context.project.reflections)) {
+      updateSources(reflection);
+      if ('signatures' in reflection && Array.isArray(reflection.signatures)) {
+        for (const signature of reflection.signatures) {
+          updateSources(signature);
         }
       }
     }
